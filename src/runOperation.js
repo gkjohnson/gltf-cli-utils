@@ -5,7 +5,6 @@ import yargs from 'yargs';
 import url from 'url';
 import path from 'path';
 import { JSDOM } from 'jsdom';
-import { MeshStandardMaterial } from 'three';
 
 const { window } = new JSDOM();
 global.FileReader = window.FileReader;
@@ -26,7 +25,12 @@ export async function runOperation( callback ) {
     const arrayBuffer = Uint8Array.prototype.slice.apply( buffer ).buffer;
 
     const result = await new GLTFLoader().parseAsync( arrayBuffer );
-    result.scene.updateMatrixWorld();
+
+    const inputScene = result.scene.children[ 0 ];
+    inputScene.removeFromParent();
+    inputScene.updateMatrixWorld();
+    result.scene = inputScene;
+    
     const scene = callback( result );
 
     const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );

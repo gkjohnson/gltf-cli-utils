@@ -80,8 +80,16 @@ runOperation( ( { scene, parser } ) => {
             mesh.quaternion.copy( object.quaternion );
             mesh.scale.copy( object.scale );
 
-            object.parent.add( mesh );
-            object.removeFromParent();
+            if ( object.parent ) {
+
+                object.parent.add( mesh );
+                object.removeFromParent();
+
+            } else if ( object === scene ) {
+
+                scene = mesh;
+
+            }
 
             let found = false;
             object.children.forEach( c => {
