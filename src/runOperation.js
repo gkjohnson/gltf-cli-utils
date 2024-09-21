@@ -31,7 +31,7 @@ export async function runOperation( callback ) {
     inputScene.updateMatrixWorld();
     result.scene = inputScene;
     
-    const scene = callback( result );
+    const scene = await callback( result );
 
     const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
     writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
