@@ -1,5 +1,10 @@
 # glTF CLI Utils
 
+### TODO
+- make global cli entry
+- stats
+- cull non visible
+
 ### Generate UVs
 
 Generates a new UV channel for every geometry in the file.
