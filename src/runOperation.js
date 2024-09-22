@@ -39,7 +39,7 @@ export async function runOperation( callback ) {
         const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
         writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
 
-    } else {
+    } else if ( scene !== null ) {
 
         writeFileSync( outputPath, new Uint8Array( scene.buffer ? scene.buffer : scene ) );
 
