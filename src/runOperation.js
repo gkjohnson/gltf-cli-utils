@@ -25,6 +25,7 @@ export async function runOperation( callback ) {
     const arrayBuffer = Uint8Array.prototype.slice.apply( buffer ).buffer;
 
     const result = await new GLTFLoader().parseAsync( arrayBuffer );
+    result.buffer = arrayBuffer;
 
     const inputScene = result.scene.children[ 0 ];
     inputScene.removeFromParent();
@@ -33,7 +34,15 @@ export async function runOperation( callback ) {
     
     const scene = await callback( result );
 
-    const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
-    writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
+    if ( scene.isObject3D ) {
+    
+        const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
+        writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
+
+    } else {
+
+        writeFileSync( outputPath, new Uint8Array( scene.buffer ? scene.buffer : scene ) );
+
+    }
 
 }
