@@ -2,8 +2,6 @@
 
 ### TODO
 - make global cli entry
-- stats
-- cull non visible
 
 ### Generate UVs
 
@@ -13,10 +11,6 @@ Generates a new UV channel for every geometry in the file.
 
 Merges primitives for every mesh in the file.
 
-### Cull Non Visible
-
-TODO: Remove full geometries that are not visible inside and outside the mesh.
-
 ### Stats
 
-TODO: Log the number of nodes, meshes, primitives, implied draw calls, triangles, rendered triangles in the model
+Log series of stats about the model.

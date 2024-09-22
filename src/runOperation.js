@@ -19,7 +19,7 @@ export async function runOperation( callback ) {
     const [ inputArg, outputArg ] = argv._;
 
     const inputPath = path.resolve( process.cwd(), inputArg );
-    const outputPath = path.resolve( process.cwd(), outputArg );
+    const outputPath = path.resolve( process.cwd(), outputArg || '' );
 
     const buffer = readFileSync( inputPath, { encoding: null } );
     const arrayBuffer = Uint8Array.prototype.slice.apply( buffer ).buffer;
@@ -34,12 +34,12 @@ export async function runOperation( callback ) {
     
     const scene = await callback( result );
 
-    if ( scene.isObject3D ) {
+    if ( scene && scene.isObject3D ) {
     
         const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
         writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
 
-    } else if ( scene !== null ) {
+    } else if ( scene ) {
 
         writeFileSync( outputPath, new Uint8Array( scene.buffer ? scene.buffer : scene ) );
 
