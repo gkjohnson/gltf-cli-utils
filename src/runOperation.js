@@ -27,13 +27,7 @@ export async function runOperation( callback ) {
     const result = await new GLTFLoader().parseAsync( arrayBuffer );
     result.buffer = arrayBuffer;
 
-    const inputScene = result.scene.children[ 0 ];
-    inputScene.removeFromParent();
-    inputScene.updateMatrixWorld();
-    result.scene = inputScene;
-    
     const scene = await callback( result );
-
     if ( scene && scene.isObject3D ) {
     
         const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
