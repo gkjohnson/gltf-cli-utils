@@ -223,18 +223,6 @@ runOperation( ( { scene, parser } ) => {
 
     } );
 
-    // Revert the names to the original file versions before indices are appended
-    scene.traverse( c => {
-
-        const info = parser.associations.get( c );
-        if ( info ) {
-         
-            c.name = parser.json.nodes[ info.nodes ].name;
-
-        }
-
-    } );
-
     return scene;
 
 } );
