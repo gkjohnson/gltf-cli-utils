@@ -27,14 +27,21 @@ export async function runOperation( callback ) {
     const result = await new GLTFLoader().parseAsync( arrayBuffer );
     result.buffer = arrayBuffer;
 
-    const inputScene = result.scene.children[ 0 ];
-    inputScene.removeFromParent();
-    inputScene.updateMatrixWorld();
-    result.scene = inputScene;
-    
     const scene = await callback( result );
-
     if ( scene && scene.isObject3D ) {
+
+        // Revert the names to the original file versions before indices are appended
+        scene.traverse( c => {
+
+            const parser = result.parser;
+            const info = parser.associations.get( c );
+            if ( info ) {
+            
+                c.name = parser.json.nodes[ info.nodes ].name;
+
+            }
+
+        } );
     
         const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
         writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
