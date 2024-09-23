@@ -10,6 +10,10 @@ Generates a new UV channel for every geometry in the file.
 
 Merges primitives for every mesh in the file.
 
+### Removed Unnamed
+
+Removes any non-mesh nodes with empty names in the file.
+
 ### Stats
 
 Log series of stats about the model.
