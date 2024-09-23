@@ -1,7 +1,6 @@
 # glTF CLI Utils
 
-### TODO
-- make global cli entry
+Helpers for transforming glTF files using three.js.
 
 ### Generate UVs
 
