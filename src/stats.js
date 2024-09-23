@@ -1,5 +1,12 @@
 import { runOperation } from './runOperation.js';
 
+function numberWithCommas(x) {
+
+    // https://stackoverflow.com/questions/2901102/how-to-format-a-number-with-commas-as-thousands-separators
+    return x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' );
+
+}
+
 function getTriangleCount( geometry ) {
 
     if ( geometry.index ) {
@@ -14,15 +21,14 @@ function getTriangleCount( geometry ) {
 
 }
 
-function log( field, value ) {
+function log( field, value, unit = '' ) {
 
-    console.log( field.padEnd( 30, ' ' ).padStart( 35, ' ' ) + ': ' + value );
+    console.log( field.padEnd( 30, ' ' ).padStart( 35, ' ' ) + ': ' + numberWithCommas( value ) + ' ' + unit );
 
 }
 
 runOperation( ( { scene, parser, buffer } ) => {
 
-    let totalGeometries = 0;
     let totalTriangles = 0;
     let totalNodes = 0;
     let totalDrawCalls = 0;
@@ -59,6 +65,7 @@ runOperation( ( { scene, parser, buffer } ) => {
     log( 'Meshes', parser.json.meshes.length );
     log( 'Mesh Nodes', parser.json.nodes.filter( n => 'mesh' in n ).length );
     log( 'Materials', parser.json.materials.length );
+    log( 'File Size', parseFloat( ( 1e-6 * buffer.byteLength ).toFixed( 2 ) ), 'Mb' );
 
     console.log( '' );
     console.log( 'Three.js Stats' );
@@ -66,7 +73,7 @@ runOperation( ( { scene, parser, buffer } ) => {
     log( 'Unique Geometries', geomSet.size );
     log( 'Objects', totalNodes );
     log( 'Meshes', totalDrawCalls );
-    log( 'Total Triangles', totalTriangles );
-    log( 'Drawn Triangles', drawnTriangles );
+    log( 'Total Triangles', totalTriangles, 'tris' );
+    log( 'Drawn Triangles', drawnTriangles, 'tris' );
 
 } );
