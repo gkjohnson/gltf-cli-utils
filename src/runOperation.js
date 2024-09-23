@@ -29,6 +29,19 @@ export async function runOperation( callback ) {
 
     const scene = await callback( result );
     if ( scene && scene.isObject3D ) {
+
+        // Revert the names to the original file versions before indices are appended
+        scene.traverse( c => {
+
+            const parser = result.parser;
+            const info = parser.associations.get( c );
+            if ( info ) {
+            
+                c.name = parser.json.nodes[ info.nodes ].name;
+
+            }
+
+        } );
     
         const outputBuffer = await new GLTFExporter().parseAsync( scene, { binary: true } );
         writeFileSync( outputPath, new Uint8Array( outputBuffer ) );
