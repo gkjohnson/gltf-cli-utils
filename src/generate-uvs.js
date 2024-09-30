@@ -12,12 +12,15 @@ runOperation( async ( { scene, buffer } ) => {
     // start up the puppeteer bundler
     const vite = exec( `npx vite ${ path.resolve( __dirname, './generate-uvs-script' ) }` );
 	const browser = await puppeteer.launch( {
-        headless: true,
-        // devtools: true,
+        headless: false,
+        devtools: true,
+        protocolTimeout: 0,
+        timeout: 0,
 	} );
 
     // navigate to the page
 	const page = await browser.newPage();
+    page.setDefaultTimeout( 0 );
     await page.goto( 'http://localhost:5173' );
     page
         .on('console', message => console.log( message.text() ) )
@@ -28,11 +31,29 @@ runOperation( async ( { scene, buffer } ) => {
     // pass the gltf buffer to the puppeteer instance
     // https://github.com/puppeteer/puppeteer/issues/2427#issuecomment-536002538
     const gltfString = Buffer.from( buffer ).toString( 'binary' );
-    const finalBuffer = await page.evaluate( async ( ...args ) => {
+    for ( let i = 0; i < gltfString.length; i += 1e7 ) {
 
-        return await GENERATE_UV( ...args );
+        console.log( 'transferring', ( 100 * i / gltfString.length ).toFixed( 2 ), '%' )
+        const str = gltfString.substring( i, i + 1e7 );
+        await page.evaluate( ( ...args ) => {
 
-    }, gltfString );
+            APPEND( ...args )
+
+        }, str );
+
+    }
+
+    let finalBuffer = '';
+    await page.exposeFunction( 'RETURN_CHUNK', str => {
+        
+        finalBuffer += str;
+        
+    } );
+    await page.evaluate( async () => {
+
+        return await GENERATE_UV();
+
+    } );
 
     // close the processes
     await browser.close();
