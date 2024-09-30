@@ -37,7 +37,7 @@ export async function runOperation( callback ) {
             const info = parser.associations.get( c );
             if ( info ) {
             
-                c.name = parser.json.nodes[ info.nodes ].name;
+                c.name = parser.json.nodes[ info.nodes ].name || '';
 
             }
 
