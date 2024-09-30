@@ -40,6 +40,7 @@ function createPrimitiveGeometry( prim ) {
     if ( indices ) {
 
         const bufferAttribute = new BufferAttribute( indices.getArray(), indices.getElementSize(), indices.getNormalized() );
+        indexToUint16( bufferAttribute );
         geom.setIndex( bufferAttribute );
 
     }
@@ -94,7 +95,34 @@ function applyGeometryToPrimitive( geom, prim, document ) {
 
 }
 
-window.GENERATE_UV = async ( gltfString, xatlasString, wasmString ) => {
+function indexToUint16( attr ) {
+
+    const arr = new Uint16Array( attr.count );
+    for ( let i = 0; i < attr.count; i ++ ) {
+
+        const v = attr.getX( i );
+        if ( v >= 2**16 - 1 ) {
+
+            throw new Error();
+
+        }
+
+        arr[ i ] = v;
+
+    }
+
+    attr.array = arr;
+
+}
+
+let gltfString = '';
+window.APPEND = str => {
+    
+    gltfString += str;
+    
+};
+
+window.GENERATE_UV = async () => {
 
     // initialize the unwrapper
     const unwrapper = new UVUnwrapper( { BufferAttribute } );
@@ -117,14 +145,39 @@ window.GENERATE_UV = async ( gltfString, xatlasString, wasmString ) => {
         const m = meshes[ mi ];
         const primitives = m.listPrimitives();
         for ( const pi in primitives ) {
+
+            const p = primitives[ pi ];
+            prims.add( p );
+
+        }
+
+    }
+
+    const total = prims.size;
+    let count = 0;
+    prims.clear();
+    for ( const mi in meshes ) {
+
+        const m = meshes[ mi ];
+        const primitives = m.listPrimitives();
+        for ( const pi in primitives ) {
         
             const p = primitives[ pi ];
+            if ( prims.has( p ) ) {
+
+                continue;
+
+            }
+
             prims.add( p );
             p.setAttribute( 'TEXCOORD_0', null );
 
             const geom = createPrimitiveGeometry( p );
             await unwrapper.unwrapGeometry( geom, 'uv', 'uv' );
             applyGeometryToPrimitive( geom, p, document );
+
+            count ++;
+            console.log( 'progress: ', ( 100 * count / total ).toFixed( 2 ), '%' );
 
         }
         
@@ -134,7 +187,14 @@ window.GENERATE_UV = async ( gltfString, xatlasString, wasmString ) => {
     const outputBuffer = await io
         .setVertexLayout( VertexLayout.SEPARATE )
         .writeBinary( document );
-        
-    return Buffer.from( outputBuffer.buffer ).toString( 'binary' );
+    
+    const outputString = Buffer.from( outputBuffer ).toString( 'binary' );
+    for ( let i = 0; i < outputString.length; i += 1e6 ) {
+
+        console.log( 'transferring', ( 100 * i / outputString.length ).toFixed( 2 ), '%' )
+        const str = outputString.substring( i, i + 1e6 );
+        RETURN_CHUNK( str )
+
+    }
 
 };
