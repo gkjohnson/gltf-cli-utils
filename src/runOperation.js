@@ -27,7 +27,7 @@ export async function runOperation( callback ) {
     const result = await new GLTFLoader().parseAsync( arrayBuffer );
     result.buffer = arrayBuffer;
 
-    const scene = await callback( result );
+    const scene = await callback( result, argv );
     if ( scene && scene.isObject3D ) {
 
         // Revert the names to the original file versions before indices are appended
